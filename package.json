@@ -5,5 +5,10 @@
   "main": "index.js",
   "keywords": [],
   "author": "vinhyenvodoi98",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@nebulous/skynet": "^1.1.0",
+    "fs": "0.0.1-security",
+    "prompts": "^2.3.2"
+  }
 }
