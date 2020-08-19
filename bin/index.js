@@ -54,8 +54,15 @@ const main = async () => {
     console.log('Waiting to deploy web pages to Skynet using handshake domains...');
     try {
       var body = `{"records": [{ "type": "TXT", "host": "", "value":"${url}","ttl": 0 }] }`;
-      await api('PUT', `/api/v0/dns/domains/${domain}`, body, accessKey, secretKey);
-      console.log('Deploy successfully ! Please wait for namebase to update your changes');
+      const res = await api(
+        'PUT',
+        `/api/v0/dns/domains/${domain.value}`,
+        body,
+        accessKey.value,
+        secretKey.value
+      );
+      console.log('\nStatus', res);
+      console.log('\nDeploy successfully ! Please wait for namebase to update your changes');
       console.log(`Instead, skylink : https://siasky.net/${url}`);
     } catch (error) {
       console.log(error);
