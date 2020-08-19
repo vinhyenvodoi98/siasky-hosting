@@ -1,32 +1,7 @@
 #!/usr/bin/env node
 
 const prompts = require('prompts');
-const fs = require('fs');
-const skynet = require('@nebulous/skynet');
-
-const overwrite = async (file) => {
-  try {
-    var data = fs.readFileSync(file, 'utf8');
-    var result = data.split('href="/').join('href="./');
-    result = result.split('src="/').join('src="./');
-    try {
-      fs.writeFileSync(file, result, 'utf8');
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
-};
-
-const deploy = async (directory) => {
-  let url = await skynet.uploadDirectory(directory);
-  url = url.toString().slice(6);
-  return `Upload successful, url: https://siasky.net/${url}`;
-};
+const { api, deploy, overwrite } = require('../lib/helper');
 
 const main = async () => {
   console.log('=== Skynet Setup\n');
@@ -44,16 +19,54 @@ const main = async () => {
     initial: true
   });
 
-  if (isSPW.value) {
-    console.log('\nOverwriting index.html...');
-    const isdone = await overwrite(`./${directory.value}/index.html`);
-    if (isdone) {
-      const url = await deploy(`./${directory.value}`);
-      console.log(url);
+  const isUseNb = await prompts({
+    type: 'confirm',
+    name: 'value',
+    message: 'Wanna deploy web pages to Skynet using handshake domains ?',
+    initial: true
+  });
+
+  if (isUseNb.value) {
+    // Secret
+    const accessKey = await prompts({
+      type: 'text',
+      name: 'value',
+      message: 'Enter your ACCESS_KEY :'
+    });
+
+    const secretKey = await prompts({
+      type: 'text',
+      name: 'value',
+      message: 'Enter your SECRET_KEY :'
+    });
+
+    const domain = await prompts({
+      type: 'text',
+      name: 'value',
+      message: 'Enter your DOMAIN :'
+    });
+    if (isSPW.value) {
+      console.log('\nOverwriting index.html...');
+      await overwrite(`./${directory.value}/index.html`);
+    }
+    const url = await deploy(`./${directory.value}`);
+
+    console.log('Waiting to deploy web pages to Skynet using handshake domains...');
+    try {
+      var body = `{"records": [{ "type": "TXT", "host": "", "value":"${url}","ttl": 0 }] }`;
+      await api('PUT', `/api/v0/dns/domains/${domain}`, body, accessKey, secretKey);
+      console.log('Deploy successfully ! Please wait for namebase to update your changes');
+      console.log(`Instead, skylink : https://siasky.net/${url}`);
+    } catch (error) {
+      console.log(error);
     }
   } else {
+    if (isSPW.value) {
+      console.log('\nOverwriting index.html...');
+      await overwrite(`./${directory.value}/index.html`);
+    }
     const url = await deploy(`./${directory.value}`);
-    console.log(url);
+    console.log(`Upload successful, url: https://siasky.net/${url}`);
   }
 };
 

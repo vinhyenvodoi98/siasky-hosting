@@ -1,17 +1,22 @@
 {
   "name": "siaskyhost",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.0",
+  "description": "siasky hosting",
   "main": "",
   "bin": {
     "siasky": "./bin/index.js"
   },
   "keywords": [],
+  "repository": "vinhyenvodoi98/siasky-hosting",
   "author": "vinhyenvodoi98",
   "license": "ISC",
+  "engines": {
+    "node": ">=10"
+  },
   "dependencies": {
     "@nebulous/skynet": "^1.1.0",
     "fs": "0.0.1-security",
+    "node-fetch": "^2.6.0",
     "prompts": "^2.3.2"
   }
 }
